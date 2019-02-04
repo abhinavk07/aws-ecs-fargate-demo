@@ -19,8 +19,12 @@ locals {
   my_region = "eu-west-1"
   # Use unique environment names, e.g. dev, custqa, qa, test, perf, ci, prod...
   my_env    = "dev"
-  my_prefix = "aws-ecr-demo"
+  # Use consisten prefix, e.g. <cloud-provider>-<demo-target/purpose>-demo, e.g. aws-ecs-demo
+  my_prefix = "aws-ecs-demo"
   all_demos_terraform_info = "tieto-pc-demos-terraform-backends"
+  # Reserve 10.20.*.* address space for this demonstration.
+  vpc_cidr_block = "10.20.0.0/16"
+  private_subnets = "2"
 }
 
 # NOTE: You cannot use locals in the terraform configuration since terraform
@@ -48,8 +52,10 @@ provider "aws" {
 
 # Here we inject our values to the environment definition module which creates all actual resources.
 module "env-def" {
-  source     = "../../modules/env-def"
-  prefix     = "${local.my_prefix}"
-  env        = "${local.my_env}"
-  region     = "${local.my_region}"
+  source          = "../../modules/env-def"
+  prefix          = "${local.my_prefix}"
+  env             = "${local.my_env}"
+  region          = "${local.my_region}"
+  vpc_cidr_block  = "${local.vpc_cidr_block}"
+  private_subnets = "${local.private_subnets}"
 }

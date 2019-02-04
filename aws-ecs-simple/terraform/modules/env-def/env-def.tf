@@ -16,12 +16,22 @@
 # at the beginning of the project and the ECR registry would then persist for the development period for that
 # environment.
 
+module "vpc" {
+  source           = "../vpc"
+  prefix           = "${var.prefix}"
+  env              = "${var.env}"
+  region           = "${var.region}"
+  vpc_cidr_block   = "${var.vpc_cidr_block}"
+  private_subnets  = "${var.private_subnets}"
+}
+
+
+
 # We store the Docker images of the application in this ECR registry.
 module "ecr" {
   source        = "../ecr"
   prefix        = "${var.prefix}"
   env           = "${var.env}"
   region        = "${var.region}"
-  name          = "aws-ecs-simple"
 }
 
