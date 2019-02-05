@@ -23,8 +23,7 @@ resource "aws_vpc" "ecs-vpc" {
 resource "aws_subnet" "ecs-subnet" {
   count = "${var.private_subnets}"
   availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
-  # Assumes that vpc cidr block is format "xx.yy.0.0/16", i.e. we are creating /24 for the last to numbers.
-  # TODO: Maybe create a more generic solution here later.
+  # Assumes that vpc cidr block is format "xx.yy.0.0/16", i.e. we are creating /24 for the last to numbers. A bit of a hack. TODO: Maybe create a more generic solution here later.
   cidr_block        = "${replace("${var.vpc_cidr_block}", ".0.0/16", ".${count.index}.0/24")}"
   vpc_id            = "${aws_vpc.ecs-vpc.id}"
 
