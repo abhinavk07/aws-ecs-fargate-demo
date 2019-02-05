@@ -7,6 +7,8 @@ if [ $# -ne 3 ]
 then
     echo "Usage: AWS_PROFILE=<YOUR-AWS-PROFILE> ./tag-and-push-to-ecr.sh <region> <aws-account-id> <version>"
     echo "Example: AWS_PROFILE=<YOUR-AWS-PROFILE> ./tag-and-push-to-ecr.sh eu-west-1 11111111111 0.1"
+    echo "NOTE: you can query the account id using command: "
+    echo "  AWS_PROFILE=YOUR-PROFILE aws sts get-caller-identity"
     exit 1
 fi
 

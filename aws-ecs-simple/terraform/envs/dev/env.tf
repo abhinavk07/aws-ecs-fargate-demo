@@ -16,15 +16,20 @@
 
 locals {
   # Ireland
-  my_region = "eu-west-1"
+  my_region                 = "eu-west-1"
   # Use unique environment names, e.g. dev, custqa, qa, test, perf, ci, prod...
-  my_env    = "dev"
+  my_env                    = "dev"
   # Use consisten prefix, e.g. <cloud-provider>-<demo-target/purpose>-demo, e.g. aws-ecs-demo
   my_prefix = "aws-ecs-demo"
-  all_demos_terraform_info = "tieto-pc-demos-terraform-backends"
+  all_demos_terraform_info  = "tieto-pc-demos-terraform-backends"
   # Reserve 10.20.*.* address space for this demonstration.
-  vpc_cidr_block = "10.20.0.0/16"
-  private_subnets = "2"
+  vpc_cidr_block            = "10.20.0.0/16"
+  private_subnets           = "2"
+  ecs_service_desired_count = 2
+  ecr_crm_image_version     = "0.1"
+  # See: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html
+  fargate_container_memory  = "4096"
+  fargate_container_cpu     = "1024"
 }
 
 # NOTE: You cannot use locals in the terraform configuration since terraform
@@ -52,10 +57,14 @@ provider "aws" {
 
 # Here we inject our values to the environment definition module which creates all actual resources.
 module "env-def" {
-  source          = "../../modules/env-def"
-  prefix          = "${local.my_prefix}"
-  env             = "${local.my_env}"
-  region          = "${local.my_region}"
-  vpc_cidr_block  = "${local.vpc_cidr_block}"
-  private_subnets = "${local.private_subnets}"
+  source                    = "../../modules/env-def"
+  prefix                    = "${local.my_prefix}"
+  env                       = "${local.my_env}"
+  region                    = "${local.my_region}"
+  vpc_cidr_block            = "${local.vpc_cidr_block}"
+  private_subnets           = "${local.private_subnets}"
+  ecs_service_desired_count = "${local.ecs_service_desired_count}"
+  ecr_crm_image_version     = "${local.ecr_crm_image_version}"
+  fargate_container_memory  = "${local.fargate_container_memory}"
+  fargate_container_cpu     = "${local.fargate_container_cpu}"
 }

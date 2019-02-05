@@ -4,7 +4,7 @@ locals {
   my_crm_name = "java-crm-demo"
 }
 
-resource "aws_ecr_repository" "aws-ecs-simple-repository" {
+resource "aws_ecr_repository" "ecs-ecr-repository" {
   name = "${local.my_name}-${local.my_crm_name}"
   tags {
     Name        = "${local.my_name}"

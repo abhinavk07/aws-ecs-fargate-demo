@@ -1,0 +1,15 @@
+[
+  {
+    "name": "crm",
+    "image": "${crm_image_url}",
+    "memory": ${fargate_container_memory},
+    "cpu": ${fargate_container_cpu},
+    "networkMode": "awsvpc",
+    "portMappings": [
+      {
+        "containerPort": 5055,
+        "hostPort": 5055
+      }
+    ]
+  }
+]
