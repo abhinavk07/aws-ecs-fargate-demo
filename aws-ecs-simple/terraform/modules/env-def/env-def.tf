@@ -15,12 +15,16 @@
 # at the beginning of the project and the ECR registry would then persist for the development period for that
 # environment.
 
+# Resource group is not actually needed in this demo.
+# Just wanted to see how it could be used.
 module "resource-group" {
   source           = "../resource-group"
   prefix           = "${var.prefix}"
   env              = "${var.env}"
 }
 
+# We could run the demo in default vpc but it is a good idea to isolate
+# even small demos to a dedicated vpc.
 module "vpc" {
   source           = "../vpc"
   prefix           = "${var.prefix}"
@@ -30,8 +34,6 @@ module "vpc" {
   private_subnets  = "${var.private_subnets}"
 }
 
-
-
 # We store the Docker images of the application in this ECR registry.
 module "ecr" {
   source        = "../ecr"
@@ -39,4 +41,5 @@ module "ecr" {
   env           = "${var.env}"
   region        = "${var.region}"
 }
+
 

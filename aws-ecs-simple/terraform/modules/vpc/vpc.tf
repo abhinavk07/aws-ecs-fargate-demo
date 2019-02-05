@@ -4,10 +4,6 @@ locals {
 }
 
 
-# Using example provided in
-# https://github.com/terraform-providers/terraform-provider-aws/blob/master/examples/eks-getting-started/vpc.tf
-# With some of my own conventions.
-
 data "aws_availability_zones" "available" {}
 
 
@@ -41,42 +37,43 @@ resource "aws_subnet" "ecs-subnet" {
     Terraform   = "true"
   }
 }
-//
-//resource "aws_internet_gateway" "ecs-internet-gateway" {
-//  vpc_id = "${aws_vpc.ecs-vpc.id}"
-//
-//  tags {
-//    Name        = "${local.my_name}-ig"
-//    Environment = "${local.my_env}"
-//    Prefix      = "${var.prefix}"
-//    Env         = "${var.env}"
-//    Region      = "${var.region}"
-//    Terraform   = "true"
-//  }
-//}
-//
-//
-//resource "aws_route_table" "ecs-route-table" {
-//  vpc_id = "${aws_vpc.ecs-vpc.id}"
-//
-//  route {
-//    cidr_block = "0.0.0.0/0"
-//    gateway_id = "${aws_internet_gateway.ecs-internet-gateway.id}"
-//  }
-//
-//  tags {
-//    Name        = "${local.my_name}-route-table"
-//    Environment = "${local.my_env}"
-//    Prefix      = "${var.prefix}"
-//    Env         = "${var.env}"
-//    Region      = "${var.region}"
-//    Terraform   = "true"
-//  }
-//}
-//
-//resource "aws_route_table_association" "eks-route-table-association" {
-//  count = 2
-//
-//  subnet_id      = "${aws_subnet.eks-subnet.*.id[count.index]}"
-//  route_table_id = "${aws_route_table.eks-route-table.id}"
-//}
+
+
+resource "aws_internet_gateway" "ecs-internet-gateway" {
+  vpc_id = "${aws_vpc.ecs-vpc.id}"
+
+  tags {
+    Name        = "${local.my_name}-ig"
+    Environment = "${local.my_env}"
+    Prefix      = "${var.prefix}"
+    Env         = "${var.env}"
+    Region      = "${var.region}"
+    Terraform   = "true"
+  }
+}
+
+
+resource "aws_route_table" "ecs-route-table" {
+  vpc_id = "${aws_vpc.ecs-vpc.id}"
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_internet_gateway.ecs-internet-gateway.id}"
+  }
+
+  tags {
+    Name        = "${local.my_name}-route-table"
+    Environment = "${local.my_env}"
+    Prefix      = "${var.prefix}"
+    Env         = "${var.env}"
+    Region      = "${var.region}"
+    Terraform   = "true"
+  }
+}
+
+
+resource "aws_route_table_association" "ecs-route-table-association" {
+  count = "${var.private_subnets}"
+  subnet_id      = "${aws_subnet.ecs-subnet.*.id[count.index]}"
+  route_table_id = "${aws_route_table.ecs-route-table.id}"
+}
