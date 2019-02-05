@@ -41,34 +41,35 @@ resource "aws_subnet" "ecs-subnet" {
     Terraform   = "true"
   }
 }
-
+//
 //resource "aws_internet_gateway" "ecs-internet-gateway" {
 //  vpc_id = "${aws_vpc.ecs-vpc.id}"
 //
 //  tags {
-//    Name        = "${local.my_name}-internet-gateway"
+//    Name        = "${local.my_name}-ig"
 //    Environment = "${local.my_env}"
 //    Prefix      = "${var.prefix}"
 //    Env         = "${var.env}"
 //    Region      = "${var.region}"
 //    Terraform   = "true"
-//    Environment = "${local.my_env}"
-//    Terraform   = "true"
 //  }
 //}
 //
 //
-//resource "aws_route_table" "eks-route-table" {
-//  vpc_id = "${aws_vpc.eks-vpc.id}"
+//resource "aws_route_table" "ecs-route-table" {
+//  vpc_id = "${aws_vpc.ecs-vpc.id}"
 //
 //  route {
 //    cidr_block = "0.0.0.0/0"
-//    gateway_id = "${aws_internet_gateway.eks-internet-gateway.id}"
+//    gateway_id = "${aws_internet_gateway.ecs-internet-gateway.id}"
 //  }
 //
 //  tags {
 //    Name        = "${local.my_name}-route-table"
 //    Environment = "${local.my_env}"
+//    Prefix      = "${var.prefix}"
+//    Env         = "${var.env}"
+//    Region      = "${var.region}"
 //    Terraform   = "true"
 //  }
 //}

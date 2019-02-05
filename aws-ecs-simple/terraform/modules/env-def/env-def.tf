@@ -11,10 +11,15 @@
 # 3. Use script TODO to deploy the application Docker image to ECR.
 # 3. Uncomment all modules.
 # 4. Run terraform init and apply. This creates other resources and also deploys the ECS using the image in ECR.
-
 # NOTE: In real world development we wouldn't need that procedure, of course, since the ECR registry would be created
 # at the beginning of the project and the ECR registry would then persist for the development period for that
 # environment.
+
+module "resource-group" {
+  source           = "../resource-group"
+  prefix           = "${var.prefix}"
+  env              = "${var.env}"
+}
 
 module "vpc" {
   source           = "../vpc"
