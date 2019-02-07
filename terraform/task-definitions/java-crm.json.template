@@ -7,8 +7,8 @@
     "networkMode": "awsvpc",
     "portMappings": [
       {
-        "containerPort": 5055,
-        "hostPort": 5055
+        "containerPort": ${app_port},
+        "hostPort": ${app_port}
       }
     ]
   }

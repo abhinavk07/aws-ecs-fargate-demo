@@ -30,6 +30,7 @@ locals {
   # See: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html
   fargate_container_memory  = "4096"
   fargate_container_cpu     = "1024"
+  app_port                  = "5055"
 }
 
 # NOTE: You cannot use locals in the terraform configuration since terraform
@@ -67,4 +68,5 @@ module "env-def" {
   ecr_crm_image_version     = "${local.ecr_crm_image_version}"
   fargate_container_memory  = "${local.fargate_container_memory}"
   fargate_container_cpu     = "${local.fargate_container_cpu}"
+  app_port                  = "${local.app_port}"
 }

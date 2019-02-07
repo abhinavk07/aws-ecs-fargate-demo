@@ -41,6 +41,21 @@ resource "aws_iam_role_policy_attachment" "ecs-task-execution-role-policy-attach
 }
 
 
+resource "aws_security_group" "ecs-subnet-sg" {
+  name = "${local.my_name}-ecs-subnet-sg"
+  description = "${local.my_name} ECS subnet security group"
+  vpc_id = "${var.vpc_id}"
+
+  # TODO: Check later that accepts only from ELB.
+  ingress {
+    from_port   = 0
+    to_port     = "${var.app_port}"
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+
 
 resource "aws_ecs_cluster" "ecs-cluster" {
   name = "${local.my_name}-cluster"
@@ -66,6 +81,7 @@ data "template_file" "ecs_crm_task_def_template" {
     crm_image_url            = "${var.ecr_image_url}:${var.ecr_crm_image_version}"
     fargate_container_memory = "${var.fargate_container_memory}"
     fargate_container_cpu    = "${var.fargate_container_cpu}"
+    app_port                 = "${var.app_port}"
   }
 }
 
@@ -93,8 +109,8 @@ resource "aws_ecs_task_definition" "ecs-task-definition" {
     "networkMode": "awsvpc",
     "portMappings": [
       {
-        "containerPort": 8080,
-        "hostPort": 8080
+        "containerPort": ${var.app_port},
+        "hostPort": ${var.app_port}
       }
     ]
   }
@@ -119,13 +135,21 @@ resource "aws_ecs_service" "ecs-service" {
   desired_count   = "${var.ecs_service_desired_count}"
   task_definition = "${aws_ecs_task_definition.ecs-task-definition.arn}"
 
-  tags {
-    Name        = "${local.my_name}-ecs-service"
-    Environment = "${local.my_env}"
-    Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
-    Region      = "${var.region}"
-    Terraform   = "true"
+  network_configuration {
+    subnets = ["${var.ecs_subnet_ids}"]
+    security_groups = ["${aws_security_group.ecs-subnet-sg.id}"]
   }
+
+  // NOTE: Does not support tagging. Maybe migrate later.
+  // The new ARN and resource ID format must be enabled to add tags to the service.
+  // Opt in to the new format and try again.
+//  tags {
+//    Name        = "${local.my_name}-ecs-service"
+//    Environment = "${local.my_env}"
+//    Prefix      = "${var.prefix}"
+//    Env         = "${var.env}"
+//    Region      = "${var.region}"
+//    Terraform   = "true"
+//  }
 
 }

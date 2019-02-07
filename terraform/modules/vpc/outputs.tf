@@ -3,8 +3,9 @@ output "vpc_id" {
   value = "${aws_vpc.ecs-vpc.id}"
 }
 
+# ECS network configuration needs these.
 output "subnet_ids" {
-  value = "${aws_subnet.ecs-subnet.*.id}"
+  value = ["${aws_subnet.ecs-subnet.*.id}"]
 }
 
 data "aws_subnet_ids" "output-ecs-subnet-ids" {

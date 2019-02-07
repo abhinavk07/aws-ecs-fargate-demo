@@ -32,6 +32,7 @@ module "vpc" {
   region           = "${var.region}"
   vpc_cidr_block   = "${var.vpc_cidr_block}"
   private_subnets  = "${var.private_subnets}"
+  app_port         = "${var.app_port}"
 }
 
 # We store the Docker images of the application in this ECR registry.
@@ -53,4 +54,7 @@ module "ecs" {
   ecr_crm_image_version     = "${var.ecr_crm_image_version}"
   fargate_container_memory  = "${var.fargate_container_memory}"
   fargate_container_cpu     = "${var.fargate_container_cpu}"
+  ecs_subnet_ids            = "${module.vpc.subnet_ids}"
+  app_port                  = "${var.app_port}"
+  vpc_id                    = "${module.vpc.vpc_id}"
 }
