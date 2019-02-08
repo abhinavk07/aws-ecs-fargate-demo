@@ -43,18 +43,18 @@ module "ecr" {
   region        = "${var.region}"
 }
 
-module "ecs" {
-  source                    = "../ecs"
-  prefix                    = "${var.prefix}"
-  env                       = "${var.env}"
-  region                    = "${var.region}"
-  ecs_service_desired_count = "${var.ecs_service_desired_count}"
-  ecs_subnet_az_names       = "${module.vpc.ecs_subnet_availability_zones}"
-  ecr_image_url             = "${module.ecr.ecr_url}"
-  ecr_crm_image_version     = "${var.ecr_crm_image_version}"
-  fargate_container_memory  = "${var.fargate_container_memory}"
-  fargate_container_cpu     = "${var.fargate_container_cpu}"
-  ecs_subnet_ids            = "${module.vpc.subnet_ids}"
-  app_port                  = "${var.app_port}"
-  vpc_id                    = "${module.vpc.vpc_id}"
-}
+//module "ecs" {
+//  source                    = "../ecs"
+//  prefix                    = "${var.prefix}"
+//  env                       = "${var.env}"
+//  region                    = "${var.region}"
+//  ecs_service_desired_count = "${var.ecs_service_desired_count}"
+//  ecs_subnet_az_names       = "${module.vpc.ecs_subnet_availability_zones}"
+//  ecr_image_url             = "${module.ecr.ecr_url}"
+//  ecr_crm_image_version     = "${var.ecr_crm_image_version}"
+//  fargate_container_memory  = "${var.fargate_container_memory}"
+//  fargate_container_cpu     = "${var.fargate_container_cpu}"
+//  ecs_subnet_ids            = "${module.vpc.subnet_ids}"
+//  app_port                  = "${var.app_port}"
+//  vpc_id                    = "${module.vpc.vpc_id}"
+//}

@@ -75,7 +75,7 @@ resource "aws_ecs_cluster" "ecs-cluster" {
 # dynamically and we do not expose our AWS account id in json code
 # (the image url comprises the AWS account id). But let's put all code explicitely here using inline container definition.
 # So, NOTE: Not used in this demo, kept for historical reasons.
-data "template_file" "ecs_crm_task_def_template" {
+data "template_file" "ecs-crm-task-def-template" {
   template = "${file("../../task-definitions/java-crm.json.template")}"
   vars {
     crm_image_url            = "${var.ecr_image_url}:${var.ecr_crm_image_version}"
@@ -99,13 +99,34 @@ resource "aws_ecs_task_definition" "ecs-task-definition" {
 
   # NOTE: You cannot quote int64 in inline section!!! (I.e., do not close
   # ${var.fargate_container_memory} inside double quotes (").
+//  container_definitions = <<CONTAINERDEFINITION
+//[
+//  {
+//    "name": "${local.my_name}-crm-container",
+//    "memory": ${var.fargate_container_memory},
+//    "cpu": ${var.fargate_container_cpu},
+//    "image": "${var.ecr_image_url}:${var.ecr_crm_image_version}",
+//    "networkMode": "awsvpc",
+//    "portMappings": [
+//      {
+//        "containerPort": ${var.app_port},
+//        "hostPort": ${var.app_port}
+//      }
+//    ]
+//  }
+//]
+//CONTAINERDEFINITION
+
+
+  # TESTING:
+
   container_definitions = <<CONTAINERDEFINITION
 [
   {
     "name": "${local.my_name}-crm-container",
     "memory": ${var.fargate_container_memory},
     "cpu": ${var.fargate_container_cpu},
-    "image": "${var.ecr_image_url}:${var.ecr_crm_image_version}",
+    "image": "nginx:1.13.9-alpine",
     "networkMode": "awsvpc",
     "portMappings": [
       {
@@ -116,6 +137,9 @@ resource "aws_ecs_task_definition" "ecs-task-definition" {
   }
 ]
 CONTAINERDEFINITION
+
+
+
 
   tags {
     Name        = "${local.my_name}-java-crm-task-definition"
@@ -136,6 +160,8 @@ resource "aws_ecs_service" "ecs-service" {
   task_definition = "${aws_ecs_task_definition.ecs-task-definition.arn}"
 
   network_configuration {
+    # TODO: public ip just for debugging, comment later.
+    assign_public_ip = "true"
     subnets = ["${var.ecs_subnet_ids}"]
     security_groups = ["${aws_security_group.ecs-subnet-sg.id}"]
   }

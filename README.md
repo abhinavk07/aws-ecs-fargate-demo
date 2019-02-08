@@ -8,6 +8,10 @@
 - [Demo Manuscript](#demo-manuscript)
 
 
+# *********** NOTE: WORK IN PROGRESS!!! ***************
+
+**Work in progress**. I'll remove this chapter when this demonstration is ready.
+
 # Introduction
 
 This infra code demonstrates how to create a simple AWS [ECS](https://aws.amazon.com/ecs/) container service using [Fargate](https://aws.amazon.com/fargate/). The demonstration also creates an [ECR](https://aws.amazon.com/ecr/) container registry for storing the application Docker image.
