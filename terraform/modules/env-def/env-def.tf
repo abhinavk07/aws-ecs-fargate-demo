@@ -22,10 +22,11 @@ data "aws_caller_identity" "current" {}
 
 # Resource group is not actually needed in this demo.
 # Just wanted to see how it could be used.
-module "resource-group" {
-  source           = "../resource-group"
+module "resource-groups" {
+  source           = "../resource-groups"
   prefix           = "${var.prefix}"
   env              = "${var.env}"
+  region           = "${var.region}"
 }
 
 # We could run the demo in default vpc but it is a good idea to isolate
