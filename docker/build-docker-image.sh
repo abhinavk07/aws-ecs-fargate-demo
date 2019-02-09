@@ -24,6 +24,5 @@ echo "Done with image $MY_IMAGE_NAME:$MY_IMAGE_VERSION"
 echo "Cleaning ..."
 rm -rf resources
 rm *.jar
-rm *.sh
 cd ..
 echo "All Done"

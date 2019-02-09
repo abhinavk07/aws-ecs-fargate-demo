@@ -24,6 +24,7 @@ locals {
   all_demos_terraform_info  = "tieto-pc-demos-terraform-backends"
   # Reserve 10.20.*.* address space for this demonstration.
   vpc_cidr_block            = "10.20.0.0/16"
+  # TODO: Change to "private_subnets_count" to make name more explicit.
   private_subnets           = "2"
   ecs_service_desired_count = 2
   ecr_crm_image_version     = "0.1"
@@ -45,7 +46,7 @@ terraform {
     # NOTE: This must be unique for each Tieto PC demo!!!
     # Use the same prefix and dev as in local!
     # I.e. key = "<prefix>/<dev>/terraform.tfstate".
-    key        = "aws-ecr-demo/dev/terraform.tfstate"
+    key        = "aws-ecs-fargate-demo/dev/terraform.tfstate"
     region     = "eu-west-1"
     # NOTE: We use the same DynamoDB table for locking all state files of all demos. Do not change name.
     dynamodb_table = "tieto-pc-demos-terraform-backends"

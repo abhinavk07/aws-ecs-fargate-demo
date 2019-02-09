@@ -2,8 +2,11 @@ variable "prefix" {}
 variable "env" {}
 variable "region" {}
 variable "ecs_service_desired_count" {}
-variable "ecs_subnet_az_names" {}
-variable "ecs_subnet_ids" {
+variable "ecs_private_subnet_az_names" {}
+variable "ecs_private_subnet_ids" {
+  type = "list"
+}
+variable "alb_public_subnet_ids" {
   type = "list"
 }
 variable "ecr_image_url" {}
@@ -12,3 +15,4 @@ variable "fargate_container_memory" {}
 variable "fargate_container_cpu" {}
 variable "app_port" {}
 variable "vpc_id" {}
+variable "aws_account_id" {}
