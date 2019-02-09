@@ -52,11 +52,11 @@ The [vpc](terraform/modules/vpc) module turned out to be much bigger than I orig
 
 ## ECR module
 
-The [ecr](terraform/modules/ecr) is pretty simple: it defines the only repository we need in this demonstration, the "java-crm-demo" repository.
+The [ecr](terraform/modules/ecr) module is pretty simple: it defines the only repository we need in this demonstration, the "java-crm-demo" repository.
 
 ## ECS module
 
-The [ecs](terraform/modules/ecs) also turned out to be more challenging than I thought it would be before starting this exercise. There is quite a lot of stuff in the ecs module:
+The [ecs](terraform/modules/ecs) module also turned out to be more challenging than I thought it would be before starting this exercise. There is quite a lot of stuff in the ecs module:
 
 - IAM role for ECS task execution ( + role policy)
 - ECS cluster
@@ -69,7 +69,7 @@ The ECS even with using Fargate is not an easy beast to configure.
 
 ## Resource Groups module
 
-The [resource-groups](terraform/modules/resource-groups) defines a dedicated resource group for each tag key I use in all AWS resources that support tagging. The tag keys are:
+The [resource-groups](terraform/modules/resource-groups) module defines a dedicated resource group for each tag key I use in all AWS resources that support tagging. The tag keys are:
 
 - Name: <prefix>-<env>-<name-of-the-resource>, e.g. "aws-ecs-demo-dev-vpc" (Not used in resource groups, of course)
 - Env: <env>, e.g. "dev"
