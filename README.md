@@ -84,6 +84,8 @@ This way you can pretty easily search the resources. Examples:
 - Prefix = "aws-ecs-demo" => All AWS ECS demo resources in all envs (dev, perf, qa, prod...)
 - Environment = "aws-ecs-demo-dev" => The resources of a specific terraform deployment (since each demo has dedicated deployments for all envs)
 
+In AWS Console go to "Resource Groups" view => Saved Resource Groups => You see the 5 resource groups => Click one and you see all resources regarding that tag key and value.
+
 
 # Demo Manuscript
 
