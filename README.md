@@ -50,6 +50,8 @@ The demo application is dockerized since the Docker image is used in ECS. The ac
 
 The [vpc](terraform/modules/vpc) module turned out to be much bigger than I originally thought I need. The reason mainly was that I wanted to make the demonstration as real-like as possible, e.g. putting ECS to private subnet, providing [application load balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html) and other security features. Those decisions rippled to the VPC in that sense that I needed to add some extra infra boilerplate, e.g. needed to add a nat public subnet since ECS cannot pull images from the private subnet unless it has a route table to a nat in a public subnet which directs traffic to internet gateway etc.
 
+I did cut some corners, though. E.g. there is just one nat gateway in one availability zone serving all private subnets in different availability zones. This would not be that much of a problem in real-world production since the nat is just needed in the initialization of the ECS / task definition (booting Docker containers) to pull the Docker image from ECR. But it would be easy to add a dedicated nat to each availability zone (adding expenses - one of the reasons I added just one nat in this exercise).
+
 ## ECR module
 
 The [ecr](terraform/modules/ecr) module is pretty simple: it defines the only repository we need in this demonstration, the "java-crm-demo" repository.
@@ -81,7 +83,7 @@ The [resource-groups](terraform/modules/resource-groups) module defines a dedica
 This way you can pretty easily search the resources. Examples:
 
 - Env = "dev" => All resources in all projects which have deployed as "dev"
-- Prefix = "aws-ecs-demo" => All AWS ECS demo resources in all envs (dev, perf, qa, prod...)
+- Prefix = "aws-ecs-demo" => All AWS ECS demo resources in all envs (dev, perf, qa, prod...
 - Environment = "aws-ecs-demo-dev" => The resources of a specific terraform deployment (since each demo has dedicated deployments for all envs)
 
 In AWS Console go to "Resource Groups" view => Saved Resource Groups => You see the 5 resource groups => Click one and you see all resources regarding that tag key and value.

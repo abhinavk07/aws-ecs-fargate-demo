@@ -31,9 +31,7 @@ locals {
   # See: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html
   fargate_container_memory  = "4096"
   fargate_container_cpu     = "1024"
-  # TODO: debugging
-  app_port                  = "80"
-  #app_port                  = "5055"
+  app_port                  = "5055"
 }
 
 # NOTE: You cannot use locals in the terraform configuration since terraform

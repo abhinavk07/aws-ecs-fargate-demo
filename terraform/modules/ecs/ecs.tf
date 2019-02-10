@@ -5,7 +5,7 @@ locals {
 
 # See: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html
 resource "aws_iam_role" "ecs-task-execution-role" {
-  name = "${local.my_name}-ecs-task-execution-role"
+  name = "${local.my_name}-task-execution-role"
 
   assume_role_policy = <<ROLEPOLICY
 {
@@ -24,7 +24,7 @@ resource "aws_iam_role" "ecs-task-execution-role" {
 ROLEPOLICY
 
   tags {
-    Name        = "${local.my_name}-ecs-task-execution-role"
+    Name        = "${local.my_name}-task-execution-role"
     Environment = "${local.my_env}"
     Prefix      = "${var.prefix}"
     Env         = "${var.env}"
@@ -83,44 +83,23 @@ resource "aws_ecs_task_definition" "ecs-task-definition" {
 
   # NOTE: You cannot quote int64 in inline section!!! (I.e., do not close
   # ${var.fargate_container_memory} inside double quotes (").
-//  container_definitions = <<CONTAINERDEFINITION
-//[
-//  {
-//    "name": "${local.my_name}-crm-container",
-//    "memory": ${var.fargate_container_memory},
-//    "cpu": ${var.fargate_container_cpu},
-//    "image": "${var.ecr_image_url}:${var.ecr_crm_image_version}",
-//    "networkMode": "awsvpc",
-//    "portMappings": [
-//      {
-//        "containerPort": ${var.app_port},
-//        "hostPort": ${var.app_port}
-//      }
-//    ]
-//  }
-//]
-//CONTAINERDEFINITION
-
-
-  # TESTING:
   container_definitions = <<CONTAINERDEFINITION
 [
   {
     "name": "${local.my_name}-crm-container",
     "memory": ${var.fargate_container_memory},
     "cpu": ${var.fargate_container_cpu},
-    "image": "nginx:1.13.9-alpine",
+    "image": "${var.ecr_image_url}:${var.ecr_crm_image_version}",
     "networkMode": "awsvpc",
     "portMappings": [
       {
-        "containerPort": 80,
+        "containerPort": ${var.app_port},
         "hostPort": ${var.app_port}
       }
     ]
   }
 ]
 CONTAINERDEFINITION
-
 
   tags {
     Name        = "${local.my_name}-java-crm-task-definition"
@@ -130,11 +109,12 @@ CONTAINERDEFINITION
     Region      = "${var.region}"
     Terraform   = "true"
   }
+
 }
 
 # See: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html#access-logging-bucket-permissions
 resource "aws_s3_bucket" "ecs-alb-s3-log-bucket" {
-  bucket = "${local.my_name}-ecs-alb-s3-log-bucket"
+  bucket = "${local.my_name}-alb-s3-log-bucket"
   policy = <<BUCKETPOLICY
 {
   "Id": "Policy1549706693168",
@@ -146,7 +126,7 @@ resource "aws_s3_bucket" "ecs-alb-s3-log-bucket" {
         "s3:PutObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::aws-ecs-demo-dev-ecs-ecs-alb-s3-log-bucket/alb-log/AWSLogs/${var.aws_account_id}/*",
+      "Resource": "arn:aws:s3:::aws-ecs-demo-dev-ecs-alb-s3-log-bucket/alb-log/AWSLogs/${var.aws_account_id}/*",
       "Principal": {
         "AWS": [
           "156460612806"
@@ -158,7 +138,7 @@ resource "aws_s3_bucket" "ecs-alb-s3-log-bucket" {
 BUCKETPOLICY
 
   tags {
-    Name        = "${local.my_name}-ecs-alb-s3-log-bucket"
+    Name        = "${local.my_name}-alb-s3-log-bucket"
     Environment = "${local.my_env}"
     Prefix      = "${var.prefix}"
     Env         = "${var.env}"
@@ -169,21 +149,31 @@ BUCKETPOLICY
 
 
 resource "aws_security_group" "ecs-alb-sg" {
-  name = "${local.my_name}-ecs-alb-sg"
-  description = "${local.my_name} ECS alb security group"
+  name = "${local.my_name}-alb-sg"
+  description = "${local.my_name} - ECS alb security group"
   vpc_id = "${var.vpc_id}"
 
-  # TODO: Check later that accepts only from ELB.
+
   ingress {
     from_port   = 0
     to_port     = "${var.app_port}"
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags {
+    Name        = "${local.my_name}-alb-sg"
+    Environment = "${local.my_env}"
+    Prefix      = "${var.prefix}"
+    Env         = "${var.env}"
+    Region      = "${var.region}"
+    Terraform   = "true"
+  }
+
 }
 
 resource "aws_alb" "ecs-alb" {
-  name               = "${local.my_name}-ecsl-alb"
+  name               = "${local.my_name}-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = ["${aws_security_group.ecs-alb-sg.id}"]
@@ -198,7 +188,7 @@ resource "aws_alb" "ecs-alb" {
   }
 
   tags {
-    Name        = "${local.my_name}-ecs-alb"
+    Name        = "${local.my_name}-alb"
     Environment = "${local.my_env}"
     Prefix      = "${var.prefix}"
     Env         = "${var.env}"
@@ -219,15 +209,24 @@ resource "aws_alb_listener" "alb_listener" {
 }
 
 resource "aws_alb_target_group" "ecs-alb-target-group" {
-  name        = "${local.my_name}-ecs-alb-tg"
+  name        = "${local.my_name}-alb-tg"
   port        = "${var.app_port}"
   protocol    = "HTTP"
   vpc_id      = "${var.vpc_id}"
   target_type = "ip"
+
+  tags {
+    Name        = "${local.my_name}-alb-tg"
+    Environment = "${local.my_env}"
+    Prefix      = "${var.prefix}"
+    Env         = "${var.env}"
+    Region      = "${var.region}"
+    Terraform   = "true"
+  }
 }
 
 resource "aws_security_group" "ecs-task-sg" {
-  name     = "${local.my_name}-ecs-task-sg"
+  name     = "${local.my_name}-task-sg"
   description = "Allow inbound access from the ALB only"
   vpc_id      = "${var.vpc_id}"
 
@@ -244,10 +243,20 @@ resource "aws_security_group" "ecs-task-sg" {
     to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags {
+    Name        = "${local.my_name}-task-sg"
+    Environment = "${local.my_env}"
+    Prefix      = "${var.prefix}"
+    Env         = "${var.env}"
+    Region      = "${var.region}"
+    Terraform   = "true"
+  }
+
 }
 
 resource "aws_ecs_service" "ecs-service" {
-  name            = "${local.my_name}-ecs-service"
+  name            = "${local.my_name}-service"
   cluster         = "${aws_ecs_cluster.ecs-cluster.id}"
   launch_type     = "FARGATE"
   desired_count   = "${var.ecs_service_desired_count}"
@@ -261,9 +270,7 @@ resource "aws_ecs_service" "ecs-service" {
   load_balancer {
     target_group_arn = "${aws_alb_target_group.ecs-alb-target-group.arn}"
     container_name   = "${local.my_name}-crm-container",
-    // TODO: testing
-    container_port   = "80"
-    //container_port   = "${var.app_port}"
+    container_port   = "${var.app_port}"
   }
 
   depends_on = [
@@ -274,7 +281,7 @@ resource "aws_ecs_service" "ecs-service" {
   // The new ARN and resource ID format must be enabled to add tags to the service.
   // Opt in to the new format and try again.
 //  tags {
-//    Name        = "${local.my_name}-ecs-service"
+//    Name        = "${local.my_name}-service"
 //    Environment = "${local.my_env}"
 //    Prefix      = "${var.prefix}"
 //    Env         = "${var.env}"
