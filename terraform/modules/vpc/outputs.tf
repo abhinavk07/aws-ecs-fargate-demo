@@ -9,7 +9,7 @@ output "ecs_private_subnet_ids" {
 }
 
 output "alb_public_subnet_ids" {
-  value = ["${aws_subnet.ecs-alb-public-subnet.*.id}"]
+  value = ["${aws_subnet.alb-public-subnet.*.id}"]
 }
 
 
@@ -17,9 +17,6 @@ output "internet_gateway_id" {
   value = ["${aws_internet_gateway.internet-gateway.id}"]
 }
 
-# TODO: Terraform apply fails the first time when creating vpc module from scratch.
-# Most probably some dependency is not ready.
-# Just run the terraform apply again.
 data "aws_subnet_ids" "output-ecs-private-subnet-ids" {
   vpc_id = "${aws_vpc.ecs-vpc.id}"
 }
@@ -36,5 +33,14 @@ output "ecs_subnet_cidr_blocks" {
 # ECS needs to know the availability zone names used for ECS cluster.
 output "ecs_subnet_availability_zones" {
   value = ["${data.aws_subnet.output-ecs-private-subnet.*.availability_zone}"]
+}
+
+
+output "alb-public-subnet-sg_id" {
+  value = "${aws_security_group.alb-public-subnet-sg.id}"
+}
+
+output "ecs_private_subnet_sg_id" {
+  value = "${aws_security_group.ecs-private-subnet-sg.id}"
 }
 

@@ -39,8 +39,8 @@ resource "aws_internet_gateway" "internet-gateway" {
 
 resource "aws_subnet" "nat-public-subnet" {
   # Assumes that vpc cidr block is format "xx.yy.0.0/16", i.e. we are creating /24 for the last to numbers. A bit of a hack. TODO: Maybe create a more generic solution here later.
-  cidr_block        = "${replace("${var.vpc_cidr_block}", ".0.0/16", ".5.0/24")}"
   vpc_id            = "${aws_vpc.ecs-vpc.id}"
+  cidr_block        = "${replace("${var.vpc_cidr_block}", ".0.0/16", ".5.0/24")}"
   availability_zone = "${data.aws_availability_zones.available.names[0]}"
 
   tags {
@@ -52,6 +52,29 @@ resource "aws_subnet" "nat-public-subnet" {
     Terraform   = "true"
   }
 }
+
+resource "aws_security_group" "nat-public-subnet-sg" {
+  name        = "${local.my_name}-nat-public-subnet-sg"
+  description = "For testing purposes, create ingress rules manually"
+  vpc_id      = "${aws_vpc.ecs-vpc.id}"
+
+  ingress {
+    from_port   = 0
+    to_port     = "${var.app_port}"
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name        = "${local.my_name}-ecs-private-subnet-sg"
+    Environment = "${local.my_env}"
+    Prefix      = "${var.prefix}"
+    Env         = "${var.env}"
+    Region      = "${var.region}"
+    Terraform   = "true"
+  }
+}
+
 
 # AWS ECS/Fargate needs EIP/NAT to pull the images.
 resource "aws_eip" "nat-gw-eip" {
@@ -103,19 +126,19 @@ resource "aws_route_table" "nat-public-subnet-route-table" {
 }
 
 # From our public NAT to Internet gateway.
-resource "aws_route_table_association" "public-nat-subnet-route-table-association" {
+resource "aws_route_table_association" "nat-public-subnet-route-table-association" {
   subnet_id      = "${aws_subnet.nat-public-subnet.id}"
   route_table_id = "${aws_route_table.nat-public-subnet-route-table.id}"
 }
 
 
 resource "aws_subnet" "ecs-private-subnet" {
+  vpc_id            = "${aws_vpc.ecs-vpc.id}"
   count = "${var.private_subnets}"
   availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
   # Assumes that vpc cidr block is format "xx.yy.0.0/16", i.e. we are creating /24 for the last to numbers. A bit of a hack.
   # TODO: Maybe create a more generic solution here later.
   cidr_block        = "${replace("${var.vpc_cidr_block}", ".0.0/16", ".${count.index}.0/24")}"
-  vpc_id            = "${aws_vpc.ecs-vpc.id}"
 
   tags {
     Name        = "${local.my_name}-${count.index}-ecs-private-subnet"
@@ -127,16 +150,27 @@ resource "aws_subnet" "ecs-private-subnet" {
   }
 }
 
-resource "aws_subnet" "ecs-alb-public-subnet" {
-  count = "${var.private_subnets}"
-  availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
-  # Assumes that vpc cidr block is format "xx.yy.0.0/16", i.e. we are creating /24 for the last to numbers. A bit of a hack.
-  # TODO: Maybe create a more generic solution here later.
-  cidr_block        = "${replace("${var.vpc_cidr_block}", ".0.0/16", ".${count.index+10}.0/24")}"
-  vpc_id            = "${aws_vpc.ecs-vpc.id}"
+resource "aws_security_group" "ecs-private-subnet-sg" {
+  name        = "${local.my_name}-ecs-private-subnet-sg"
+  description = "Allow inbound access from the ALB only"
+  vpc_id      = "${aws_vpc.ecs-vpc.id}"
+
+  ingress {
+    protocol        = "tcp"
+    from_port       = "0"
+    to_port         = "${var.app_port}"
+    security_groups = ["${aws_security_group.alb-public-subnet-sg.id}"]
+  }
+
+  egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   tags {
-    Name        = "${local.my_name}-${count.index+10}-ecs-alb-public-subnet"
+    Name        = "${local.my_name}-ecs-private-subnet-sg"
     Environment = "${local.my_env}"
     Prefix      = "${var.prefix}"
     Env         = "${var.env}"
@@ -156,7 +190,6 @@ resource "aws_route_table" "ecs-private-subnet-route-table" {
     nat_gateway_id = "${aws_nat_gateway.nat-gw.id}"
   }
 
-
   tags {
     Name        = "${local.my_name}-ecs-private-subnet-route-table"
     Environment = "${local.my_env}"
@@ -172,6 +205,72 @@ resource "aws_route_table_association" "ecs-private-subnet-route-table-associati
   count = "${var.private_subnets}"
   subnet_id      = "${aws_subnet.ecs-private-subnet.*.id[count.index]}"
   route_table_id = "${aws_route_table.ecs-private-subnet-route-table.id}"
+}
+
+
+resource "aws_subnet" "alb-public-subnet" {
+  vpc_id            = "${aws_vpc.ecs-vpc.id}"
+  count = "${var.private_subnets}"
+  availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
+  # Assumes that vpc cidr block is format "xx.yy.0.0/16", i.e. we are creating /24 for the last to numbers. A bit of a hack.
+  # TODO: Maybe create a more generic solution here later.
+  cidr_block        = "${replace("${var.vpc_cidr_block}", ".0.0/16", ".${count.index+10}.0/24")}"
+
+  tags {
+    Name        = "${local.my_name}-${count.index+10}-alb-public-subnet"
+    Environment = "${local.my_env}"
+    Prefix      = "${var.prefix}"
+    Env         = "${var.env}"
+    Region      = "${var.region}"
+    Terraform   = "true"
+  }
+}
+
+resource "aws_security_group" "alb-public-subnet-sg" {
+  name        = "${local.my_name}-alb-public-subnet-sg"
+  description = "Allow inbound access to application port only, oubound to ECS"
+  vpc_id      = "${aws_vpc.ecs-vpc.id}"
+
+  ingress {
+    from_port   = 0
+    to_port     = "${var.app_port}"
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name        = "${local.my_name}-alb-public-subnet-sg"
+    Environment = "${local.my_env}"
+    Prefix      = "${var.prefix}"
+    Env         = "${var.env}"
+    Region      = "${var.region}"
+    Terraform   = "true"
+  }
+
+}
+
+resource "aws_route_table" "alb-public-subnet-route-table" {
+  vpc_id = "${aws_vpc.ecs-vpc.id}"
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_internet_gateway.internet-gateway.id}"
+  }
+
+  tags {
+    Name        = "${local.my_name}-alb-public-subnet-route-table"
+    Environment = "${local.my_env}"
+    Prefix      = "${var.prefix}"
+    Env         = "${var.env}"
+    Region      = "${var.region}"
+    Terraform   = "true"
+  }
+}
+
+resource "aws_route_table_association" "ecs-alb-public-subnet-route-table-association" {
+  count = "${var.private_subnets}"
+  subnet_id      = "${aws_subnet.alb-public-subnet.*.id[count.index]}"
+  route_table_id = "${aws_route_table.alb-public-subnet-route-table.id}"
 }
 
 

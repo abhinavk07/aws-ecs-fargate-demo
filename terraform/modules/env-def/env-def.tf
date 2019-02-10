@@ -65,4 +65,6 @@ module "ecs" {
   app_port                     = "${var.app_port}"
   vpc_id                       = "${module.vpc.vpc_id}"
   aws_account_id               = "${data.aws_caller_identity.current.account_id}"
+  ecs_private_subnet_sg_id     = "${module.vpc.ecs_private_subnet_sg_id}"
+  alb-public-subnet-sg_id      = "${module.vpc.alb-public-subnet-sg_id}"
 }

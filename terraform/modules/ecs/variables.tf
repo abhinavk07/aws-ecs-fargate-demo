@@ -16,3 +16,7 @@ variable "fargate_container_cpu" {}
 variable "app_port" {}
 variable "vpc_id" {}
 variable "aws_account_id" {}
+
+variable "alb-public-subnet-sg_id" {}
+variable "ecs_private_subnet_sg_id" {}
+

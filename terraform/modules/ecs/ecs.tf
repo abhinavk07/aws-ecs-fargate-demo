@@ -148,35 +148,12 @@ BUCKETPOLICY
 }
 
 
-resource "aws_security_group" "ecs-alb-sg" {
-  name = "${local.my_name}-alb-sg"
-  description = "${local.my_name} - ECS alb security group"
-  vpc_id = "${var.vpc_id}"
-
-
-  ingress {
-    from_port   = 0
-    to_port     = "${var.app_port}"
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags {
-    Name        = "${local.my_name}-alb-sg"
-    Environment = "${local.my_env}"
-    Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
-    Region      = "${var.region}"
-    Terraform   = "true"
-  }
-
-}
 
 resource "aws_alb" "ecs-alb" {
   name               = "${local.my_name}-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = ["${aws_security_group.ecs-alb-sg.id}"]
+  security_groups    = ["${var.alb-public-subnet-sg_id}"]
   subnets            = ["${var.alb_public_subnet_ids}"]
 
   //enable_deletion_protection = true
@@ -214,6 +191,12 @@ resource "aws_alb_target_group" "ecs-alb-target-group" {
   protocol    = "HTTP"
   vpc_id      = "${var.vpc_id}"
   target_type = "ip"
+  health_check {
+    path = "/health"
+    matcher = "200"
+    interval = "10"
+    protocol = "HTTP"
+  }
 
   tags {
     Name        = "${local.my_name}-alb-tg"
@@ -225,35 +208,6 @@ resource "aws_alb_target_group" "ecs-alb-target-group" {
   }
 }
 
-resource "aws_security_group" "ecs-task-sg" {
-  name     = "${local.my_name}-task-sg"
-  description = "Allow inbound access from the ALB only"
-  vpc_id      = "${var.vpc_id}"
-
-  ingress {
-    protocol        = "tcp"
-    from_port       = "${var.app_port}"
-    to_port         = "${var.app_port}"
-    security_groups = ["${aws_security_group.ecs-alb-sg.id}"]
-  }
-
-  egress {
-    protocol    = "-1"
-    from_port   = 0
-    to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags {
-    Name        = "${local.my_name}-task-sg"
-    Environment = "${local.my_env}"
-    Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
-    Region      = "${var.region}"
-    Terraform   = "true"
-  }
-
-}
 
 resource "aws_ecs_service" "ecs-service" {
   name            = "${local.my_name}-service"
@@ -264,7 +218,7 @@ resource "aws_ecs_service" "ecs-service" {
 
   network_configuration {
     subnets = ["${var.ecs_private_subnet_ids}"]
-    security_groups = ["${aws_security_group.ecs-task-sg.id}"]
+    security_groups = ["${var.ecs_private_subnet_sg_id}"]
   }
 
   load_balancer {
@@ -277,17 +231,14 @@ resource "aws_ecs_service" "ecs-service" {
     "aws_alb_listener.alb_listener"
   ]
 
-  // NOTE: Does not support tagging. Maybe migrate later.
-  // The new ARN and resource ID format must be enabled to add tags to the service.
-  // Opt in to the new format and try again.
-//  tags {
-//    Name        = "${local.my_name}-service"
-//    Environment = "${local.my_env}"
-//    Prefix      = "${var.prefix}"
-//    Env         = "${var.env}"
-//    Region      = "${var.region}"
-//    Terraform   = "true"
-//  }
+  tags {
+    Name        = "${local.my_name}-service"
+    Environment = "${local.my_env}"
+    Prefix      = "${var.prefix}"
+    Env         = "${var.env}"
+    Region      = "${var.region}"
+    Terraform   = "true"
+  }
 
 }
 
