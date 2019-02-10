@@ -65,6 +65,14 @@ resource "aws_security_group" "nat-public-subnet-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  // Terraform removes the default rule.
+  egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   tags {
     Name        = "${local.my_name}-ecs-private-subnet-sg"
     Environment = "${local.my_env}"
@@ -162,6 +170,7 @@ resource "aws_security_group" "ecs-private-subnet-sg" {
     security_groups = ["${aws_security_group.alb-public-subnet-sg.id}"]
   }
 
+  // Terraform removes the default rule.
   egress {
     protocol    = "-1"
     from_port   = 0
@@ -189,6 +198,8 @@ resource "aws_route_table" "ecs-private-subnet-route-table" {
     cidr_block = "0.0.0.0/0"
     nat_gateway_id = "${aws_nat_gateway.nat-gw.id}"
   }
+
+
 
   tags {
     Name        = "${local.my_name}-ecs-private-subnet-route-table"
@@ -235,6 +246,14 @@ resource "aws_security_group" "alb-public-subnet-sg" {
     from_port   = 0
     to_port     = "${var.app_port}"
     protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  // Terraform removes the default rule.
+  egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
   }
 

@@ -16,12 +16,17 @@
 # environment.
 
 
+locals {
+  my_name  = "${var.prefix}-${var.env}"
+  my_env   = "${var.prefix}-${var.env}"
+}
+
+
 # ECS bucket policy needs aws account id.
 data "aws_caller_identity" "current" {}
 
 
-# Resource group is not actually needed in this demo.
-# Just wanted to see how it could be used.
+# You can use Resource groups to find resources. See AWS Console => Resource Groups => Saved.
 module "resource-groups" {
   source           = "../resource-groups"
   prefix           = "${var.prefix}"
@@ -67,4 +72,20 @@ module "ecs" {
   aws_account_id               = "${data.aws_caller_identity.current.account_id}"
   ecs_private_subnet_sg_id     = "${module.vpc.ecs_private_subnet_sg_id}"
   alb-public-subnet-sg_id      = "${module.vpc.alb-public-subnet-sg_id}"
+}
+
+# For testing purposes (not needed in actual infra - just testing connections,
+# route tables and security group rules).
+# Comment in real action - uncomment when debugging connections between subnets.
+module "testing-ec2-instances" {
+  source                       = "../testing-ec2-instances"
+  prefix                       = "${var.prefix}"
+  env                          = "${var.env}"
+  region                       = "${var.region}"
+  ecs_private_subnet_ids       = "${module.vpc.ecs_private_subnet_ids}"
+  alb_public_subnet_ids        = "${module.vpc.alb_public_subnet_ids}"
+  nat-public_subnet_id         = "${module.vpc.nat_public_subnet_id}"
+  ecs_private_subnet_sg_id     = "${module.vpc.ecs_private_subnet_sg_id}"
+  alb-public-subnet-sg_id      = "${module.vpc.alb-public-subnet-sg_id}"
+  nat-public_subnet_sg_id      = "${module.vpc.nat_public_subnet_sg_id}"
 }

@@ -12,6 +12,10 @@ output "alb_public_subnet_ids" {
   value = ["${aws_subnet.alb-public-subnet.*.id}"]
 }
 
+output "nat_public_subnet_id" {
+  value = "${aws_subnet.nat-public-subnet.id}"
+}
+
 
 output "internet_gateway_id" {
   value = ["${aws_internet_gateway.internet-gateway.id}"]
@@ -42,5 +46,9 @@ output "alb-public-subnet-sg_id" {
 
 output "ecs_private_subnet_sg_id" {
   value = "${aws_security_group.ecs-private-subnet-sg.id}"
+}
+
+output "nat_public_subnet_sg_id" {
+  value = "${aws_security_group.nat-public-subnet-sg.id}"
 }
 
