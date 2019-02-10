@@ -65,6 +65,14 @@ resource "aws_security_group" "nat-public-subnet-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # For testing purposes.
+  ingress {
+    from_port   = 0
+    to_port     = "22"
+    protocol    = "tcp"
+    cidr_blocks = ["${var.admin_workstation_ip}"]
+  }
+
   // Terraform removes the default rule.
   egress {
     protocol    = "-1"
@@ -170,6 +178,22 @@ resource "aws_security_group" "ecs-private-subnet-sg" {
     security_groups = ["${aws_security_group.alb-public-subnet-sg.id}"]
   }
 
+  # For testing purposes.
+  ingress {
+    from_port   = 0
+    to_port     = "22"
+    protocol    = "tcp"
+    cidr_blocks = ["${var.admin_workstation_ip}"]
+  }
+
+  # For testing purposes.
+  ingress {
+    from_port   = 0
+    to_port     = "${var.app_port}"
+    protocol    = "tcp"
+    cidr_blocks = ["${var.admin_workstation_ip}"]
+  }
+
   // Terraform removes the default rule.
   egress {
     protocol    = "-1"
@@ -247,6 +271,22 @@ resource "aws_security_group" "alb-public-subnet-sg" {
     to_port     = "${var.app_port}"
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # For testing purposes.
+  ingress {
+    from_port   = 0
+    to_port     = "22"
+    protocol    = "tcp"
+    cidr_blocks = ["${var.admin_workstation_ip}"]
+  }
+
+  # For testing purposes.
+  ingress {
+    from_port   = 0
+    to_port     = "${var.app_port}"
+    protocol    = "tcp"
+    cidr_blocks = ["${var.admin_workstation_ip}"]
   }
 
   // Terraform removes the default rule.

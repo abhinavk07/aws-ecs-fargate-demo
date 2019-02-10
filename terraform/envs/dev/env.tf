@@ -57,6 +57,10 @@ provider "aws" {
   region     = "${local.my_region}"
 }
 
+# Admin workstation ip, must be injected with
+# export TF_VAR_admin_workstation_ip="11.11.11.11/32"
+variable "admin_workstation_ip" {}
+
 # Here we inject our values to the environment definition module which creates all actual resources.
 module "env-def" {
   source                    = "../../modules/env-def"
@@ -70,4 +74,5 @@ module "env-def" {
   fargate_container_memory  = "${local.fargate_container_memory}"
   fargate_container_cpu     = "${local.fargate_container_cpu}"
   app_port                  = "${local.app_port}"
+  admin_workstation_ip      = "${var.admin_workstation_ip}"
 }

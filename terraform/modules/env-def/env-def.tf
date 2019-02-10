@@ -44,6 +44,7 @@ module "vpc" {
   vpc_cidr_block   = "${var.vpc_cidr_block}"
   private_subnets  = "${var.private_subnets}"
   app_port         = "${var.app_port}"
+  admin_workstation_ip = "${var.admin_workstation_ip}"
 }
 
 # We store the Docker images of the application in this ECR registry.

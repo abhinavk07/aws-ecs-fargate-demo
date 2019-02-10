@@ -8,4 +8,4 @@ variable "ecr_crm_image_version" {}
 variable "fargate_container_memory" {}
 variable "fargate_container_cpu" {}
 variable "app_port" {}
-
+variable "admin_workstation_ip" {}

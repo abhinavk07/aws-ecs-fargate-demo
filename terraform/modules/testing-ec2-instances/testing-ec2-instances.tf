@@ -17,11 +17,11 @@ resource "aws_eip" "nat-ec2-eip" {
 }
 
 resource "aws_instance" "nat-ec2" {
-  ami             = "ami-08935252a36e25f85"
-  instance_type   = "t2.micro"
-  security_groups = ["${var.nat-public_subnet_sg_id}"]
-  subnet_id       = "${var.nat-public_subnet_id}"
-  key_name        = "${local.my_key_name}"
+  ami                    = "ami-08935252a36e25f85"
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = ["${var.nat-public_subnet_sg_id}"]
+  subnet_id              = "${var.nat-public_subnet_id}"
+  key_name               = "${local.my_key_name}"
 
 
   tags {
@@ -40,11 +40,11 @@ resource "aws_eip" "alb-ec2-eip" {
 }
 
 resource "aws_instance" "alb-ec2" {
-  ami             = "ami-08935252a36e25f85"
-  instance_type   = "t2.micro"
-  security_groups = ["${var.alb-public-subnet-sg_id}"]
-  subnet_id       = "${var.alb_public_subnet_ids[0]}"
-  key_name        = "${local.my_key_name}"
+  ami                    = "ami-08935252a36e25f85"
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = ["${var.alb-public-subnet-sg_id}"]
+  subnet_id              = "${var.alb_public_subnet_ids[0]}"
+  key_name               = "${local.my_key_name}"
 
   tags {
     Name        = "${local.my_name}-alb"
@@ -62,11 +62,11 @@ resource "aws_eip" "ecs-ec2-eip" {
 }
 
 resource "aws_instance" "ecs-ec2" {
-  ami             = "ami-08935252a36e25f85"
-  instance_type   = "t2.micro"
-  security_groups = ["${var.ecs_private_subnet_sg_id}"]
-  subnet_id       = "${var.ecs_private_subnet_ids[0]}"
-  key_name        = "${local.my_key_name}"
+  ami                    = "ami-08935252a36e25f85"
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = ["${var.ecs_private_subnet_sg_id}"]
+  subnet_id              = "${var.ecs_private_subnet_ids[0]}"
+  key_name               = "${local.my_key_name}"
 
   tags {
     Name        = "${local.my_name}-ecs"
