@@ -27,7 +27,7 @@ The AWS solution is depicted in the diagram below.
 
 All AWS resources are documented in more detail in the Terraform Code chapter.
 
-The demonstration uses a dedicated VPC for this demonstration. There are two public subnets for the Application load balancer (ALB) and two private subnets for the ECS infrastructure. There is also a public subnet for the NAT infrastructure for ECS to pull public images. All subnets have a security group which allows only inbound/outbound traffic that is needed for the resources in that subnet. 
+The demonstration uses a dedicated VPC for this demonstration. There are two public subnets for the Application load balancer (ALB) and two private subnets for the ECS infrastructure (in the diagram ECS and Fargate are depicted in the bigger AZ just for diagram clarity) in two availability zones. There is also a public subnet for the NAT infrastructure for ECS to pull public images. All subnets have a dedicated security group which allows only inbound/outbound traffic that is needed for the resources in that subnet. 
 
 There is also an internet gateway for NAT, a S3 Bucket for ALB logs, an ECR for storing Docker images used by ECS and an IAM role for running the ECS tasks.
 
