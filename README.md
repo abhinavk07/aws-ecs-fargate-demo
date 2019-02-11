@@ -3,6 +3,7 @@
 
 # Table of Contents  <!-- omit in toc -->
 - [Introduction](#introduction)
+- [AWS Solution](#aws-solution)
 - [Terraform Code](#terraform-code)
 - [Demo Application](#demo-application)
 - [Terraform Modules](#terraform-modules)
@@ -17,6 +18,19 @@
 # Introduction
 
 This infra code demonstrates how to create a simple AWS [ECS](https://aws.amazon.com/ecs/) container service using [Fargate](https://aws.amazon.com/fargate/). The demonstration also creates an [ECR](https://aws.amazon.com/ecr/) container registry for storing the application Docker image. The demonstration uses the [Java Simple Rest Demo CRM Application ](https://github.com/tieto-pc/java-simple-rest-demo-app) as a demo application.
+
+# AWS Solution
+
+The AWS solution is depicted in the diagram below.
+
+![AWS ECS Fargate Demo Topology](docs/aws-ecs-fargate-demo-diagram.png?raw=true "AWS ECS Fargate Demo Topology")
+
+All AWS resources are documented in more detail in the Terraform Code chapter.
+
+The demonstration uses a dedicated VPC for this demonstration. There are two public subnets for the Application load balancer (ALB) and two private subnets for the ECS infrastructure. There is also a public subnet for the NAT infrastructure for ECS to pull public images. All subnets have a security group which allows only inbound/outbound traffic that is needed for the resources in that subnet. 
+
+There is also an internet gateway for NAT, a S3 Bucket for ALB logs, an ECR for storing Docker images used by ECS and an IAM role for running the ECS tasks.
+
 
 
 # Terraform Code
@@ -44,6 +58,8 @@ The demo application is dockerized since the Docker image is used in ECS. The ac
 ## VPC module
 
 The [vpc](terraform/modules/vpc) module turned out to be much bigger than I originally thought I need. The reason mainly was that I wanted to make the demonstration a bit more real-like, e.g. putting ECS to private subnet, providing [application load balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html) and other security / redundancy features. Those decisions rippled to the VPC in that sense that I needed to add some extra infra boilerplate, e.g. needed to add a nat public subnet since ECS cannot pull images from the private subnet unless it has a route table to a nat in a public subnet which directs traffic to internet gateway etc.
+
+NOTE: I could have create a [AWS PrivateLink endpoint](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/vpc-endpoints.html) for ECR so that instances in ECS could have pulled images from ECR using the endpoint. But I wanted to test pulling images from Dockerhub so I needed the NAT / Gateway setup anyway.
 
 I did cut some corners, though. E.g. there is just one nat gateway in one availability zone serving all private subnets in different availability zones. This would not be that much of a problem in a real-world production since the nat is just needed in the initialization of the ECS / task definition (booting Docker containers) to pull the Docker image from ECR. But it would be easy to add a dedicated nat to each availability zone (adding expenses - one of the reasons I added just one nat in this exercise).
 
