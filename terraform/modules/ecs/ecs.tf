@@ -148,7 +148,6 @@ BUCKETPOLICY
 }
 
 
-
 resource "aws_alb" "ecs-alb" {
   name               = "${local.my_name}-alb"
   internal           = false
@@ -191,6 +190,7 @@ resource "aws_alb_target_group" "ecs-alb-target-group" {
   protocol    = "HTTP"
   vpc_id      = "${var.vpc_id}"
   target_type = "ip"
+  // The application must implement a /health GET API that return 200 if everything ok.
   health_check {
     path = "/health"
     matcher = "200"

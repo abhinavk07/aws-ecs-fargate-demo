@@ -58,18 +58,12 @@ resource "aws_security_group" "nat-public-subnet-sg" {
   description = "For testing purposes, create ingress rules manually"
   vpc_id      = "${aws_vpc.ecs-vpc.id}"
 
-  ingress {
-    from_port   = 0
-    to_port     = "${var.app_port}"
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 
   # For testing purposes.
   ingress {
-    from_port   = 0
-    to_port     = "22"
     protocol    = "tcp"
+    from_port   = 22
+    to_port     = 22
     cidr_blocks = ["${var.admin_workstation_ip}"]
   }
 
@@ -173,24 +167,24 @@ resource "aws_security_group" "ecs-private-subnet-sg" {
 
   ingress {
     protocol        = "tcp"
-    from_port       = "0"
+    from_port       = "${var.app_port}"
     to_port         = "${var.app_port}"
     security_groups = ["${aws_security_group.alb-public-subnet-sg.id}"]
   }
 
   # For testing purposes.
   ingress {
-    from_port   = 0
-    to_port     = "22"
     protocol    = "tcp"
+    from_port   = 22
+    to_port     = 22
     cidr_blocks = ["${var.admin_workstation_ip}"]
   }
 
   # For testing purposes.
   ingress {
-    from_port   = 0
-    to_port     = "${var.app_port}"
     protocol    = "tcp"
+    from_port   = "${var.app_port}"
+    to_port     = "${var.app_port}"
     cidr_blocks = ["${var.admin_workstation_ip}"]
   }
 
@@ -267,25 +261,25 @@ resource "aws_security_group" "alb-public-subnet-sg" {
   vpc_id      = "${aws_vpc.ecs-vpc.id}"
 
   ingress {
-    from_port   = 0
-    to_port     = "${var.app_port}"
     protocol    = "tcp"
+    from_port   = "${var.app_port}"
+    to_port     = "${var.app_port}"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   # For testing purposes.
   ingress {
-    from_port   = 0
-    to_port     = "22"
     protocol    = "tcp"
+    from_port   = 22
+    to_port     = 22
     cidr_blocks = ["${var.admin_workstation_ip}"]
   }
 
   # For testing purposes.
   ingress {
-    from_port   = 0
-    to_port     = "${var.app_port}"
     protocol    = "tcp"
+    from_port   = "${var.app_port}"
+    to_port     = "${var.app_port}"
     cidr_blocks = ["${var.admin_workstation_ip}"]
   }
 
