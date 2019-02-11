@@ -1,7 +1,7 @@
 locals {
   my_name  = "${var.prefix}-${var.env}-test-ec2"
   my_env   = "${var.prefix}-${var.env}"
-  my_key_name = "Kari-testing"
+  my_key_name = "aws-ecs-fargate-demo-testing-ec2-key"
 }
 
 # NOTE: These ec2 instances are used just for debugging purposes regarding
