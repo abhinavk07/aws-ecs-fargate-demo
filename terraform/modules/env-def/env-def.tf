@@ -8,7 +8,7 @@
 # for the ECR.
 # 1. Comment all other modules except ECR.
 # 2. Run terraform init and apply. This creates only the ECR.
-# 3. Use script TODO to deploy the application Docker image to ECR.
+# 3. Use script 'tag-and-push-to-ecr.sh' to deploy the application Docker image to ECR.
 # 3. Uncomment all modules.
 # 4. Run terraform init and apply. This creates other resources and also deploys the ECS using the image in ECR.
 # NOTE: In real world development we wouldn't need that procedure, of course, since the ECR registry would be created

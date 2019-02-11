@@ -6,10 +6,9 @@ locals {
 
 # NOTE: These ec2 instances are used just for debugging purposes regarding
 # connections between entities in different subnets.
-# NOTE: This module assumes that there is an existing "Kari-testing" key-pair.
-# TODO: Create new keypair and rename it as "ecs-fargate-demo-keypair"
-# and change the name in local.
-# Or create the key-pair dynamically.
+# NOTE: This module assumes that there is an existing key-pair with the
+# same name as used in the local.my_key_name (see above).
+# NOTE: Improvement suggestion: create the key-pair dynamically and use it here.
 
 resource "aws_eip" "nat-ec2-eip" {
   instance = "${aws_instance.nat-ec2.id}"
