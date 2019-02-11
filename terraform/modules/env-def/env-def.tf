@@ -80,15 +80,15 @@ module "ecs" {
 # For testing purposes (not needed in actual infra - just testing connections,
 # route tables and security group rules).
 # Comment in real action - uncomment when debugging connections between subnets.
-module "testing-ec2-instances" {
-  source                       = "../testing-ec2-instances"
-  prefix                       = "${var.prefix}"
-  env                          = "${var.env}"
-  region                       = "${var.region}"
-  ecs_private_subnet_ids       = "${module.vpc.ecs_private_subnet_ids}"
-  alb_public_subnet_ids        = "${module.vpc.alb_public_subnet_ids}"
-  nat-public_subnet_id         = "${module.vpc.nat_public_subnet_id}"
-  ecs_private_subnet_sg_id     = "${module.vpc.ecs_private_subnet_sg_id}"
-  alb-public-subnet-sg_id      = "${module.vpc.alb-public-subnet-sg_id}"
-  nat-public_subnet_sg_id      = "${module.vpc.nat_public_subnet_sg_id}"
-}
+//module "testing-ec2-instances" {
+//  source                       = "../testing-ec2-instances"
+//  prefix                       = "${var.prefix}"
+//  env                          = "${var.env}"
+//  region                       = "${var.region}"
+//  ecs_private_subnet_ids       = "${module.vpc.ecs_private_subnet_ids}"
+//  alb_public_subnet_ids        = "${module.vpc.alb_public_subnet_ids}"
+//  nat-public_subnet_id         = "${module.vpc.nat_public_subnet_id}"
+//  ecs_private_subnet_sg_id     = "${module.vpc.ecs_private_subnet_sg_id}"
+//  alb-public-subnet-sg_id      = "${module.vpc.alb-public-subnet-sg_id}"
+//  nat-public_subnet_sg_id      = "${module.vpc.nat_public_subnet_sg_id}"
+//}

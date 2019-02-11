@@ -4,6 +4,7 @@
 # Table of Contents  <!-- omit in toc -->
 - [Introduction](#introduction)
 - [AWS Solution](#aws-solution)
+- [Deployment Instructions](#deployment-instructions)
 - [Terraform Code](#terraform-code)
 - [Demo Application](#demo-application)
 - [Terraform Modules](#terraform-modules)
@@ -11,6 +12,7 @@
   - [ECR module](#ecr-module)
   - [ECS module](#ecs-module)
   - [Resource Groups module](#resource-groups-module)
+- [Testing the Application Running in ECS](#testing-the-application-running-in-ecs)
 - [Demo Manuscript](#demo-manuscript)
 
 
@@ -27,17 +29,19 @@ The AWS solution is depicted in the diagram below.
 
 All AWS resources are documented in more detail in the Terraform Code chapter.
 
-The demonstration uses a dedicated VPC for this demonstration. There are two public subnets for the Application load balancer (ALB) and two private subnets for the ECS infrastructure (in the diagram ECS and Fargate are depicted in the bigger AZ just for diagram clarity) in two availability zones. There is also a public subnet for the NAT infrastructure for ECS to pull public images. All subnets have a dedicated security group which allows only inbound/outbound traffic that is needed for the resources in that subnet. 
+The demonstration uses a dedicated VPC. There are two public subnets for the Application load balancer (ALB) and two private subnets for the ECS infrastructure (in the diagram ECS and Fargate are depicted in the bigger AZ just for diagram clarity) in two availability zones. There is also a public subnet for the NAT infrastructure for ECS to pull public images. All subnets have a dedicated security group which allows only inbound/outbound traffic that is needed for the resources in that subnet. 
 
 There is also an internet gateway for NAT, a S3 Bucket for ALB logs, an ECR for storing Docker images used by ECS and an IAM role for running the ECS tasks.
 
+# Deployment Instructions
 
+Install Terraform. Clone this project. Open console in [dev](terraform/envs/dev) folder. Configure the terraform backend (S3 Bucket and DynamoDB table as instructed in the dev.tf file). Then usual terraform init, get, plan and apply commands.
 
 # Terraform Code
 
-We are using [Terraform](https://www.terraform.io/) as a [infrastructure as code](https://en.wikipedia.org/wiki/Infrastructure_as_code) (IaC) tool. Terraform is very much used both in AWS and Azure side and one of its strenghts compared to cloud native tools (AWS / [CloudFormation](https://aws.amazon.com/cloudformation) and Azure / [ARM templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authoring-templates)) is that you can use Terraform with many cloud providers, you have to learn just one infra language and syntax, and Terraform language (hcl) is pretty powerfull and clear.
+I am using [Terraform](https://www.terraform.io/) as a [infrastructure as code](https://en.wikipedia.org/wiki/Infrastructure_as_code) (IaC) tool. Terraform is very much used both in AWS and Azure side and one of its strenghts compared to cloud native tools (AWS / [CloudFormation](https://aws.amazon.com/cloudformation) and Azure / [ARM templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authoring-templates)) is that you can use Terraform with many cloud providers, you have to learn just one infra language and syntax, and Terraform language (hcl) is pretty powerful and clear.
 
-If you are new to infrastructure as code (IaC) and terraform specifically let's explain the high level structure of the terraform code first. Project terraform code is hosted in [terraform](https://github.com/tieto-pc/aws-small-demos/tree/master/aws-ecs-simple/terraform) folder.
+If you are new to infrastructure as code (IaC) and terraform specifically let's explain the high level structure of the terraform code first. Project's terraform code is hosted in [terraform](https://github.com/tieto-pc/aws-small-demos/tree/master/aws-ecs-simple/terraform) folder.
 
 It is a cloud best practice that you should modularize your infra code and also modularize it so that you can create many different (exact) copies of your infra as you like re-using the infra modules. I use a common practice to organize terraform code in three levels:
 
@@ -50,14 +54,14 @@ It is a cloud best practice that you should modularize your infra code and also 
 
 The demo application used in this demonstration is a simple Java REST application that simulates a CRM system. The application is hosted in a different Git repository since we are using the demo app in many cloud demonstrations: [java-simple-rest-demo-app](https://github.com/tieto-pc/java-simple-rest-demo-app). 
 
-The demo application is dockerized since the Docker image is used in ECS. The actual docker image is hosted in the ECR registry. See [docker](https://github.com/tieto-pc/aws-small-demos/tree/master/aws-ecs-simple/docker) folder for scripts how to build and tag/push the image to ECR.
+The demo application is dockerized since the Docker image is used in ECS. The actual docker image is hosted in the ECR registry. See [docker](docker) folder for scripts how to build and tag/push the image to ECR.
 
 
 # Terraform Modules
 
 ## VPC module
 
-The [vpc](terraform/modules/vpc) module turned out to be much bigger than I originally thought I need. The reason mainly was that I wanted to make the demonstration a bit more real-like, e.g. putting ECS to private subnet, providing [application load balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html) and other security / redundancy features. Those decisions rippled to the VPC in that sense that I needed to add some extra infra boilerplate, e.g. needed to add a nat public subnet since ECS cannot pull images from the private subnet unless it has a route table to a nat in a public subnet which directs traffic to internet gateway etc.
+The [vpc](terraform/modules/vpc) module turned out to be much bigger than I originally thought I need. The reason mainly was that I wanted to make the demonstration a bit more real-like, e.g. putting ECS to private subnet, providing [application load balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html) and other security / redundancy features. Those decisions rippled to the VPC in that sense that I needed to add some extra infra boilerplate, e.g. needed to add a nat public subnet since ECS cannot pull images from public repositories unless it has a route table to a nat in a public subnet which directs traffic to internet gateway etc.
 
 NOTE: I could have create a [AWS PrivateLink endpoint](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/vpc-endpoints.html) for ECR so that instances in ECS could have pulled images from ECR using the endpoint. But I wanted to test pulling images from Dockerhub so I needed the NAT / Gateway setup anyway.
 
@@ -102,6 +106,14 @@ This way you can pretty easily search the resources. Examples:
 
 In AWS Console go to "Resource Groups" view => Saved Resource Groups => You see the 5 resource groups => Click one and you see all resources regarding that tag key and value (that support tagging in AWS).
 
+# Testing the Application Running in ECS
+
+Run command 'AWS_PROFILE=YOUR-PROFILE terraform output -module=env-def.ecs' => you get the application load balancer DNS. Use it to curl the ALB:
+
+```bash
+curl http://ALB-DNS-HERE:5055/customer/1
+# => Should return: {"ret":"ok","customer":{"id":1,"email":"kari.karttinen@foo.com","firstName":"Kari","lastName":"Karttinen"}}
+```
 
 # Demo Manuscript
 
