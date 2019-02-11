@@ -26,7 +26,7 @@ data "aws_subnet_ids" "output-ecs-private-subnet-ids" {
 }
 
 data "aws_subnet" "output-ecs-private-subnet" {
-  count = "${var.private_subnets}"
+  count = "${var.private_subnet_count}"
   id    = "${data.aws_subnet_ids.output-ecs-private-subnet-ids.ids[count.index]}"
 }
 

@@ -37,14 +37,14 @@ module "resource-groups" {
 # We could run the demo in default vpc but it is a good idea to isolate
 # even small demos to a dedicated vpc.
 module "vpc" {
-  source           = "../vpc"
-  prefix           = "${var.prefix}"
-  env              = "${var.env}"
-  region           = "${var.region}"
-  vpc_cidr_block   = "${var.vpc_cidr_block}"
-  private_subnets  = "${var.private_subnets}"
-  app_port         = "${var.app_port}"
-  admin_workstation_ip = "${var.admin_workstation_ip}"
+  source                = "../vpc"
+  prefix                = "${var.prefix}"
+  env                   = "${var.env}"
+  region                = "${var.region}"
+  vpc_cidr_block        = "${var.vpc_cidr_block}"
+  private_subnet_count  = "${var.private_subnet_count}"
+  app_port              = "${var.app_port}"
+  admin_workstation_ip  = "${var.admin_workstation_ip}"
 }
 
 # We store the Docker images of the application in this ECR registry.

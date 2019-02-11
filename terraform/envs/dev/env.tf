@@ -19,13 +19,12 @@ locals {
   my_region                 = "eu-west-1"
   # Use unique environment names, e.g. dev, custqa, qa, test, perf, ci, prod...
   my_env                    = "dev"
-  # Use consisten prefix, e.g. <cloud-provider>-<demo-target/purpose>-demo, e.g. aws-ecs-demo
+  # Use consistent prefix, e.g. <cloud-provider>-<demo-target/purpose>-demo, e.g. aws-ecs-demo
   my_prefix = "aws-ecs-demo"
   all_demos_terraform_info  = "tieto-pc-demos-terraform-backends"
   # Reserve 10.20.*.* address space for this demonstration.
   vpc_cidr_block            = "10.20.0.0/16"
-  # TODO: Change to "private_subnets_count" to make name more explicit.
-  private_subnets           = "2"
+  private_subnet_count      = "2"
   ecs_service_desired_count = 2
   ecr_crm_image_version     = "0.1"
   # See: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html
@@ -68,7 +67,7 @@ module "env-def" {
   env                       = "${local.my_env}"
   region                    = "${local.my_region}"
   vpc_cidr_block            = "${local.vpc_cidr_block}"
-  private_subnets           = "${local.private_subnets}"
+  private_subnet_count      = "${local.private_subnet_count}"
   ecs_service_desired_count = "${local.ecs_service_desired_count}"
   ecr_crm_image_version     = "${local.ecr_crm_image_version}"
   fargate_container_memory  = "${local.fargate_container_memory}"

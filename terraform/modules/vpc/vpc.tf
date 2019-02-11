@@ -39,6 +39,8 @@ resource "aws_internet_gateway" "internet-gateway" {
 
 resource "aws_subnet" "nat-public-subnet" {
   # Assumes that vpc cidr block is format "xx.yy.0.0/16", i.e. we are creating /24 for the last to numbers. A bit of a hack. TODO: Maybe create a more generic solution here later.
+  # Creates just one NAT subnet. In production probably you want at least two in
+  # different AZs.
   vpc_id            = "${aws_vpc.ecs-vpc.id}"
   cidr_block        = "${replace("${var.vpc_cidr_block}", ".0.0/16", ".5.0/24")}"
   availability_zone = "${data.aws_availability_zones.available.names[0]}"
@@ -58,8 +60,7 @@ resource "aws_security_group" "nat-public-subnet-sg" {
   description = "For testing purposes, create ingress rules manually"
   vpc_id      = "${aws_vpc.ecs-vpc.id}"
 
-
-  # For testing purposes.
+  # For testing purposes for connecting ssh to test ec2 instance.
   ingress {
     protocol    = "tcp"
     from_port   = 22
@@ -76,7 +77,7 @@ resource "aws_security_group" "nat-public-subnet-sg" {
   }
 
   tags {
-    Name        = "${local.my_name}-ecs-private-subnet-sg"
+    Name        = "${local.my_name}-nat-public-subnet-sg"
     Environment = "${local.my_env}"
     Prefix      = "${var.prefix}"
     Env         = "${var.env}"
@@ -141,10 +142,10 @@ resource "aws_route_table_association" "nat-public-subnet-route-table-associatio
   route_table_id = "${aws_route_table.nat-public-subnet-route-table.id}"
 }
 
-
+# This is the private subnet hosting ECS, Fargate (EC2) and Tasks (Docker containers).
 resource "aws_subnet" "ecs-private-subnet" {
   vpc_id            = "${aws_vpc.ecs-vpc.id}"
-  count = "${var.private_subnets}"
+  count = "${var.private_subnet_count}"
   availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
   # Assumes that vpc cidr block is format "xx.yy.0.0/16", i.e. we are creating /24 for the last to numbers. A bit of a hack.
   # TODO: Maybe create a more generic solution here later.
@@ -165,6 +166,7 @@ resource "aws_security_group" "ecs-private-subnet-sg" {
   description = "Allow inbound access from the ALB only"
   vpc_id      = "${aws_vpc.ecs-vpc.id}"
 
+  # Accept inbound to app port only from ALB security group.
   ingress {
     protocol        = "tcp"
     from_port       = "${var.app_port}"
@@ -172,7 +174,7 @@ resource "aws_security_group" "ecs-private-subnet-sg" {
     security_groups = ["${aws_security_group.alb-public-subnet-sg.id}"]
   }
 
-  # For testing purposes.
+  # For testing purposes for connecting ssh to test ec2 instance.
   ingress {
     protocol    = "tcp"
     from_port   = 22
@@ -217,8 +219,6 @@ resource "aws_route_table" "ecs-private-subnet-route-table" {
     nat_gateway_id = "${aws_nat_gateway.nat-gw.id}"
   }
 
-
-
   tags {
     Name        = "${local.my_name}-ecs-private-subnet-route-table"
     Environment = "${local.my_env}"
@@ -231,15 +231,15 @@ resource "aws_route_table" "ecs-private-subnet-route-table" {
 
 # From our ECS private subnet to NAT.
 resource "aws_route_table_association" "ecs-private-subnet-route-table-association" {
-  count = "${var.private_subnets}"
+  count = "${var.private_subnet_count}"
   subnet_id      = "${aws_subnet.ecs-private-subnet.*.id[count.index]}"
   route_table_id = "${aws_route_table.ecs-private-subnet-route-table.id}"
 }
 
-
+# This subnet hosts the Application Load Balancer (ALB) which is exposed to internet.
 resource "aws_subnet" "alb-public-subnet" {
   vpc_id            = "${aws_vpc.ecs-vpc.id}"
-  count = "${var.private_subnets}"
+  count = "${var.private_subnet_count}"
   availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
   # Assumes that vpc cidr block is format "xx.yy.0.0/16", i.e. we are creating /24 for the last to numbers. A bit of a hack.
   # TODO: Maybe create a more generic solution here later.
@@ -275,7 +275,7 @@ resource "aws_security_group" "alb-public-subnet-sg" {
     cidr_blocks = ["${var.admin_workstation_ip}"]
   }
 
-  # For testing purposes.
+  # For testing purposes. We might want to deny connections for everyone (rule #1).
   ingress {
     protocol    = "tcp"
     from_port   = "${var.app_port}"
@@ -321,7 +321,7 @@ resource "aws_route_table" "alb-public-subnet-route-table" {
 }
 
 resource "aws_route_table_association" "ecs-alb-public-subnet-route-table-association" {
-  count = "${var.private_subnets}"
+  count = "${var.private_subnet_count}"
   subnet_id      = "${aws_subnet.alb-public-subnet.*.id[count.index]}"
   route_table_id = "${aws_route_table.alb-public-subnet-route-table.id}"
 }
