@@ -2,6 +2,9 @@ locals {
   my_env   = "${var.prefix}-${var.env}"
 }
 
+# Create the following resource groups for finding resources.
+# See AWS Console => Resource groups.
+
 module "rg_env" {
   source        = "resource-group"
   name          = "rg-env-rg"

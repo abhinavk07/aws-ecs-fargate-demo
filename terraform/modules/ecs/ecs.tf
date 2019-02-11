@@ -147,14 +147,14 @@ BUCKETPOLICY
   }
 }
 
-
+# Application load balancer (ALB) for the system.
+# Exposes the ECS tasks to the internet via ALB (with application port only).
 resource "aws_alb" "ecs-alb" {
   name               = "${local.my_name}-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = ["${var.alb-public-subnet-sg_id}"]
   subnets            = ["${var.alb_public_subnet_ids}"]
-
   //enable_deletion_protection = true
 
   access_logs {

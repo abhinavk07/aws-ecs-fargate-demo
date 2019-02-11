@@ -38,9 +38,9 @@ resource "aws_internet_gateway" "internet-gateway" {
 
 
 resource "aws_subnet" "nat-public-subnet" {
-  # Assumes that vpc cidr block is format "xx.yy.0.0/16", i.e. we are creating /24 for the last to numbers. A bit of a hack. NOTE: Maybe create a more generic solution here later.
-  # Creates just one NAT subnet. In production probably you want at least two in
-  # different AZs.
+  # Assumes that vpc cidr block is format "xx.yy.0.0/16", i.e. we are creating /24 for the last to numbers.
+  # NOTE: A bit of a hack. Maybe create a more generic solution here later.
+  # Creates just one NAT subnet. In production probably you want at least two in different AZs.
   vpc_id            = "${aws_vpc.ecs-vpc.id}"
   cidr_block        = "${replace("${var.vpc_cidr_block}", ".0.0/16", ".5.0/24")}"
   availability_zone = "${data.aws_availability_zones.available.names[0]}"
@@ -147,8 +147,8 @@ resource "aws_subnet" "ecs-private-subnet" {
   vpc_id            = "${aws_vpc.ecs-vpc.id}"
   count = "${var.private_subnet_count}"
   availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
-  # Assumes that vpc cidr block is format "xx.yy.0.0/16", i.e. we are creating /24 for the last to numbers. A bit of a hack.
-  # NOTE: Maybe create a more generic solution here later.
+  # Assumes that vpc cidr block is format "xx.yy.0.0/16", i.e. we are creating /24 for the last to numbers.
+  # NOTE: A bit of a hack. Maybe create a more generic solution here later.
   cidr_block        = "${replace("${var.vpc_cidr_block}", ".0.0/16", ".${count.index}.0/24")}"
 
   tags {
@@ -241,8 +241,8 @@ resource "aws_subnet" "alb-public-subnet" {
   vpc_id            = "${aws_vpc.ecs-vpc.id}"
   count = "${var.private_subnet_count}"
   availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
-  # Assumes that vpc cidr block is format "xx.yy.0.0/16", i.e. we are creating /24 for the last to numbers. A bit of a hack.
-  # NOTE: Maybe create a more generic solution here later.
+  # Assumes that vpc cidr block is format "xx.yy.0.0/16", i.e. we are creating /24 for the last to numbers.
+  # NOTE: A bit of a hack. Maybe create a more generic solution here later.
   cidr_block        = "${replace("${var.vpc_cidr_block}", ".0.0/16", ".${count.index+10}.0/24")}"
 
   tags {
@@ -302,6 +302,7 @@ resource "aws_security_group" "alb-public-subnet-sg" {
 
 }
 
+# TODO: Probably not needed. Remove later after testing.
 resource "aws_route_table" "alb-public-subnet-route-table" {
   vpc_id = "${aws_vpc.ecs-vpc.id}"
 

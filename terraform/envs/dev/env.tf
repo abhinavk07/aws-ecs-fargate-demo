@@ -9,7 +9,7 @@
 # AWS_PROFILE=pc-demo terraform plan
 # AWS_PROFILE=pc-demo terraform apply
 
-# NOTE: If you want to create a separate version of this demo, use a unique prefix, e.g. "petri-ecs-demo".
+# NOTE: If you want to create a separate version of this demo, use a unique prefix, e.g. "myname-ecs-demo".
 # This way all entities have a different name and also you create a dedicate terraform state file
 # (remember to call 'terraform destroy' once you are done with your experimentation).
 # So, you have to change the prefix in both local below and terraform configuration section in key.
@@ -22,7 +22,7 @@ locals {
   # Use consistent prefix, e.g. <cloud-provider>-<demo-target/purpose>-demo, e.g. aws-ecs-demo
   my_prefix = "aws-ecs-demo"
   all_demos_terraform_info  = "tieto-pc-demos-terraform-backends"
-  # Reserve 10.20.*.* address space for this demonstration.
+  # NOTE: Reserve 10.20.*.* address space for this demonstration.
   vpc_cidr_block            = "10.20.0.0/16"
   private_subnet_count      = "2"
   ecs_service_desired_count = 2

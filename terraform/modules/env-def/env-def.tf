@@ -55,6 +55,8 @@ module "ecr" {
   region        = "${var.region}"
 }
 
+# This is the actual ECS module which creates ECS and application load balancer (ALB)
+# to expose the ECS to the internet.
 module "ecs" {
   source                       = "../ecs"
   prefix                       = "${var.prefix}"
