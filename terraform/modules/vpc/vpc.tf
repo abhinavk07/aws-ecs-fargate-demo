@@ -145,7 +145,7 @@ resource "aws_route_table_association" "nat-public-subnet-route-table-associatio
 # This is the private subnet hosting ECS, Fargate (EC2) and Tasks (Docker containers).
 resource "aws_subnet" "ecs-private-subnet" {
   vpc_id            = "${aws_vpc.ecs-vpc.id}"
-  count = "${var.private_subnet_count}"
+  count             = "${var.private_subnet_count}"
   availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
   # Assumes that vpc cidr block is format "xx.yy.0.0/16", i.e. we are creating /24 for the last to numbers.
   # NOTE: A bit of a hack. Maybe create a more generic solution here later.
