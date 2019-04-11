@@ -1,4 +1,4 @@
 variable "env" {}
-variable "name" {}
+variable "prefix" {}
 variable "tag_key" {}
 variable "tag_value" {}

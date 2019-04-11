@@ -92,17 +92,17 @@ The ECS even with using Fargate is a bit complex to configure.
 The [resource-groups](terraform/modules/resource-groups) module defines a dedicated resource group for each tag key I use in all AWS resources that support tagging. The tag keys are:
 
 - Name: <prefix>-<env>-<name-of-the-resource>, e.g. "aws-ecs-demo-dev-vpc" (not used in resource groups, of course)
-- Env: <env>, e.g. "dev"
-- Environment: <prefix>-<env>, e.g. "aws-ecs-demo-dev"
+- Environment: <env>, e.g. "dev"
+- Deployment: <prefix>-<env>, e.g. "aws-ecs-demo-dev"
 - Prefix: <prefix>, e.g. "aws-ecs-demo"
 - Region: <region>, e.g. "eu-west-1
 - Terraform: "true" (fixed)
 
 This way you can pretty easily search the resources. Examples:
 
-- Env = "dev" => All resources in all projects which have deployed as "dev"
-- Prefix = "aws-ecs-demo" => All AWS ECS demo resources in all envs (dev, perf, qa, prod...
-- Environment = "aws-ecs-demo-dev" => The resources of a specific terraform deployment (since each demo has dedicated deployments for all envs)
+- Environment = "dev" => All resources in all projects which have deployed as "dev"
+- Prefix = "aws-ecs-demo" => All AWS ECS demo resources in all envs (dev, perf, qa, prod...)
+- Deployment = "aws-ecs-demo-dev" => The resources of a specific terraform deployment (since each demo has dedicated deployments for all envs)
 
 In AWS Console go to "Resource Groups" view => Saved Resource Groups => You see the 5 resource groups => Click one and you see all resources regarding that tag key and value (that support tagging in AWS).
 

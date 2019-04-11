@@ -1,6 +1,6 @@
 locals {
   my_name  = "${var.prefix}-${var.env}-ecs"
-  my_env   = "${var.prefix}-${var.env}"
+  my_deployment   = "${var.prefix}-${var.env}"
 }
 
 # See: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html
@@ -25,9 +25,9 @@ ROLEPOLICY
 
   tags {
     Name        = "${local.my_name}-task-execution-role"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -46,9 +46,9 @@ resource "aws_ecs_cluster" "ecs-cluster" {
 
   tags {
     Name        = "${local.my_name}-cluster"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -103,9 +103,9 @@ CONTAINERDEFINITION
 
   tags {
     Name        = "${local.my_name}-java-crm-task-definition"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -139,9 +139,9 @@ BUCKETPOLICY
 
   tags {
     Name        = "${local.my_name}-alb-s3-log-bucket"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -165,9 +165,9 @@ resource "aws_alb" "ecs-alb" {
 
   tags {
     Name        = "${local.my_name}-alb"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -200,9 +200,9 @@ resource "aws_alb_target_group" "ecs-alb-target-group" {
 
   tags {
     Name        = "${local.my_name}-alb-tg"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -233,9 +233,9 @@ resource "aws_ecs_service" "ecs-service" {
 
   tags {
     Name        = "${local.my_name}-service"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }

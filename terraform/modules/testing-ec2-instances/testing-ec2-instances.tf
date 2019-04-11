@@ -1,7 +1,7 @@
 locals {
-  my_name  = "${var.prefix}-${var.env}-test-ec2"
-  my_env   = "${var.prefix}-${var.env}"
-  my_key_name = "aws-ecs-fargate-demo-testing-ec2-key"
+  my_name       = "${var.prefix}-${var.env}-test-ec2"
+  my_deployment = "${var.prefix}-${var.env}"
+  my_key_name   = "aws-ecs-fargate-demo-testing-ec2-key"
 }
 
 # NOTE: These ec2 instances are used just for debugging purposes regarding
@@ -25,9 +25,9 @@ resource "aws_instance" "nat-ec2" {
 
   tags {
     Name        = "${local.my_name}-nat"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -47,9 +47,9 @@ resource "aws_instance" "alb-ec2" {
 
   tags {
     Name        = "${local.my_name}-alb"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -69,9 +69,9 @@ resource "aws_instance" "ecs-ec2" {
 
   tags {
     Name        = "${local.my_name}-ecs"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }

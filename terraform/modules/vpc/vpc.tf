@@ -1,6 +1,6 @@
 locals {
   my_name  = "${var.prefix}-${var.env}-vpc"
-  my_env   = "${var.prefix}-${var.env}"
+  my_deployment   = "${var.prefix}-${var.env}"
 }
 
 # Examples, see: https://github.com/terraform-aws-modules/terraform-aws-vpc
@@ -13,9 +13,9 @@ resource "aws_vpc" "ecs-vpc" {
 
   tags {
     Name        = "${local.my_name}"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -28,9 +28,9 @@ resource "aws_internet_gateway" "internet-gateway" {
 
   tags {
     Name        = "${local.my_name}-ig"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -47,9 +47,9 @@ resource "aws_subnet" "nat-public-subnet" {
 
   tags {
     Name        = "${local.my_name}-nat-public-subnet"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -78,9 +78,9 @@ resource "aws_security_group" "nat-public-subnet-sg" {
 
   tags {
     Name        = "${local.my_name}-nat-public-subnet-sg"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -92,9 +92,9 @@ resource "aws_eip" "nat-gw-eip" {
   vpc = true
   tags {
     Name        = "${local.my_name}-nat-gw-eip"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -109,9 +109,9 @@ resource "aws_nat_gateway" "nat-gw" {
 
   tags {
     Name        = "${local.my_name}-nat-gw"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -128,9 +128,9 @@ resource "aws_route_table" "nat-public-subnet-route-table" {
 
   tags {
     Name        = "${local.my_name}-nat-public-subnet-route-table"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -153,9 +153,9 @@ resource "aws_subnet" "ecs-private-subnet" {
 
   tags {
     Name        = "${local.my_name}-${count.index}-ecs-private-subnet"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -200,9 +200,9 @@ resource "aws_security_group" "ecs-private-subnet-sg" {
 
   tags {
     Name        = "${local.my_name}-ecs-private-subnet-sg"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -221,9 +221,9 @@ resource "aws_route_table" "ecs-private-subnet-route-table" {
 
   tags {
     Name        = "${local.my_name}-ecs-private-subnet-route-table"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -247,9 +247,9 @@ resource "aws_subnet" "alb-public-subnet" {
 
   tags {
     Name        = "${local.my_name}-${count.index+10}-alb-public-subnet"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -293,9 +293,9 @@ resource "aws_security_group" "alb-public-subnet-sg" {
 
   tags {
     Name        = "${local.my_name}-alb-public-subnet-sg"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
@@ -313,9 +313,9 @@ resource "aws_route_table" "alb-public-subnet-route-table" {
 
   tags {
     Name        = "${local.my_name}-alb-public-subnet-route-table"
-    Environment = "${local.my_env}"
+    Deployment  = "${local.my_deployment}"
     Prefix      = "${var.prefix}"
-    Env         = "${var.env}"
+    Environment = "${var.env}"
     Region      = "${var.region}"
     Terraform   = "true"
   }
