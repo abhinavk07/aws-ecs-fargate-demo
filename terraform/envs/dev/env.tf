@@ -20,7 +20,7 @@ locals {
   # Use unique environment names, e.g. dev, custqa, qa, test, perf, ci, prod...
   my_env                    = "dev"
   # Use consistent prefix, e.g. <cloud-provider>-<demo-target/purpose>-demo, e.g. aws-ecs-demo
-  my_prefix                 = "aws-ecs-demo"
+  my_prefix                 = "ecs-demo"
   all_demos_terraform_info  = "tieto-pc-demos-terraform-backends"
   # NOTE: Reserve 10.20.*.* address space for this demonstration.
   vpc_cidr_block            = "10.20.0.0/16"
